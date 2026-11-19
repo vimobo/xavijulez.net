@@ -1,95 +1,594 @@
+/* ======================================
+   GENERAL
+====================================== */
+
 * {
     box-sizing: border-box;
 }
 
+html,
 body {
     margin: 0;
     padding: 0;
+
     width: 100%;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    font-family: Arial, sans-serif;
+    height: 100%;
+
+    font-family: Arial, Helvetica, sans-serif;
+
+    color: #111;
+    background-color: #fff;
 }
 
-/* HEADER */
+body {
+    height: 100vh;
+    height: 100dvh;
+
+    display: flex;
+    flex-direction: column;
+
+    overflow: hidden;
+}
+
+
+/* ======================================
+   HEADER / NAVIGATION
+====================================== */
+
 header {
-    position: sticky;
-    top: 0;
     width: 100%;
     height: 70px;
     min-height: 70px;
-    border-bottom: 1px solid black ;
-    background-color: #ffffff;
+
+    flex-shrink: 0;
+
+    position: relative;
     z-index: 1000;
-}
 
-/* MAIN */
-main {
-    flex: 1;
-    width: 100%;
-}
-
-/* PROJECT CONTAINER */
-#main {
-    display: flex;
-    flex-direction: row;
-    width: 100%;
-    min-height: calc(100vh - 70px);
-}
-
-/* PROJECT LIST */
-#projectList {
-    width: 50%;
-    border-right: 1px solid black;
-    padding: 20px;
-    overflow-y: auto;
-}
-
-#projectList ul {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-}
-
-#projectList li {
-    padding: 12px;
+    background-color: white;
     border-bottom: 1px solid #ddd;
 }
 
-#projectList a {
-    text-decoration: none;
-    color: #222;
+#nav {
+    width: 100%;
+    height: 100%;
 }
 
-/* PROJECT SHOW */
+.nav-content {
+    width: 100%;
+    height: 100%;
+
+    padding: 0 30px;
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.nav-brand {
+    font-size: 20px;
+    font-weight: bold;
+}
+
+
+/* ======================================
+   LANGUAGE SELECTOR
+====================================== */
+
+.language-selector {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.language-selector label {
+    font-size: 13px;
+}
+
+.language-selector select {
+    padding: 8px 12px;
+
+    font-size: 14px;
+
+    background-color: white;
+    border: 1px solid #ccc;
+
+    cursor: pointer;
+}
+
+
+/* ======================================
+   MAIN LAYOUT
+====================================== */
+
+main {
+    flex: 1;
+
+    width: 100%;
+    min-height: 0;
+
+    overflow: hidden;
+}
+
+#main {
+    position: relative;
+
+    display: flex;
+    flex-direction: row;
+
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+
+    overflow: hidden;
+}
+
+
+/* ======================================
+   INDEPENDENT SCROLL
+====================================== */
+
+#projectList,
 #projectShow {
     width: 50%;
-    padding: 20px;
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
+    height: 100%;
+    min-height: 0;
+
+    overflow-y: auto;
+    overflow-x: hidden;
+
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
 }
 
-#projectShow img {
-    max-width: 100%;
-    max-height: 500px;
-    object-fit: contain;
+#projectList {
+    border-right: 1px solid #ddd;
 }
 
-table {
-    border: 1px solid black;
-    width: 40vw;
-    margin-left: 5vw ;
+#projectShow {
+    padding: 30px;
+}
+
+
+/* Scrollbar */
+
+#projectList::-webkit-scrollbar,
+#projectShow::-webkit-scrollbar {
+    width: 6px;
+}
+
+#projectList::-webkit-scrollbar-thumb,
+#projectShow::-webkit-scrollbar-thumb {
+    background-color: #bbb;
+}
+
+#projectList::-webkit-scrollbar-track,
+#projectShow::-webkit-scrollbar-track {
+    background-color: transparent;
+}
+
+
+/* ======================================
+   FILTER TABLE
+====================================== */
+
+#filterTable {
+    width: 100%;
+
     border-collapse: collapse;
+    table-layout: fixed;
+
+    position: sticky;
+    top: 0;
+    z-index: 10;
+
+    background-color: white;
 }
 
-table tr td {
-    border: 1px solid black;
-    height: 2vh;
+#filterTable td {
+    padding: 18px 10px;
+
     text-align: center;
+    font-size: 14px;
+
+    cursor: pointer;
+
+    border-bottom: 2px solid transparent;
+
+    transition: background-color 0.2s, border-color 0.2s;
 }
 
-h1 {
-    
+#filterTable td:hover {
+    background-color: #f2f2f2;
+}
+
+#filterTable td.active {
+    border-bottom: 2px solid black;
+    font-weight: bold;
+}
+
+
+/* ======================================
+   PROJECT LIST
+====================================== */
+
+#projectLi {
+    list-style: none;
+
+    margin: 0;
+    padding: 0;
+}
+
+#projectLi li {
+    border-bottom: 1px solid #eee;
+}
+
+#projectLi a {
+    display: block;
+
+    padding: 20px 25px;
+
+    color: inherit;
+    text-decoration: none;
+
+    transition: background-color 0.2s;
+}
+
+#projectLi a:hover {
+    background-color: #f2f2f2;
+}
+
+#projectLi a.active {
+    font-weight: bold;
+    background-color: #f2f2f2;
+}
+
+
+/* ======================================
+   PROJECT DETAIL
+====================================== */
+
+.project-content {
+    width: 100%;
+    max-width: 100%;
+}
+
+.project-content h1 {
+    margin-top: 0;
+    margin-bottom: 20px;
+
+    font-size: 32px;
+}
+
+.project-description {
+    margin-bottom: 40px;
+
+    font-size: 16px;
+    line-height: 1.6;
+}
+
+
+/* ======================================
+   CLOSE PROJECT BUTTON
+====================================== */
+
+.close-project {
+    display: none;
+}
+
+
+/* ======================================
+   PROJECT SECTIONS
+====================================== */
+
+.project-section {
+    width: 100%;
+    margin-bottom: 40px;
+}
+
+.project-section h2 {
+    margin-bottom: 15px;
+    font-size: 22px;
+}
+
+.project-section p {
+    font-size: 15px;
+    line-height: 1.7;
+}
+
+.section-image {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+}
+
+.project-section video {
+    display: block;
+    width: 100%;
+    height: auto;
+    margin-top: 20px;
+}
+
+
+/* ======================================
+   PHOTO GALLERY
+====================================== */
+
+.project-gallery {
+    width: 100%;
+    margin: 40px 0;
+}
+
+.project-gallery h2 {
+    margin-bottom: 20px;
+    font-size: 22px;
+}
+
+.gallery-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+
+    gap: 14px;
+
+    width: 100%;
+    align-items: start;
+}
+
+.gallery-item {
+    width: 100%;
+    min-width: 0;
+    margin: 0;
+}
+
+.gallery-item img {
+    display: block;
+
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+}
+
+.gallery-item figcaption {
+    padding: 8px 0;
+
+    font-size: 13px;
+    line-height: 1.4;
+}
+
+
+/* ======================================
+   PROJECT LINK
+====================================== */
+
+.project-content > a {
+    display: inline-block;
+
+    margin-top: 20px;
+    padding: 12px 20px;
+
+    color: white;
+    background-color: black;
+
+    text-decoration: none;
+
+    transition: background-color 0.2s;
+}
+
+.project-content > a:hover {
+    background-color: #444;
+}
+
+
+/* ======================================
+   MOBILE LAYOUT
+====================================== */
+
+@media (max-width: 700px) {
+
+    /* Main takes the full available space */
+    #main {
+        position: relative;
+        display: block;
+    }
+
+
+    /* Both views occupy the complete available area */
+    #projectList,
+    #projectShow {
+        position: absolute;
+
+        top: 0;
+        left: 0;
+
+        width: 100%;
+        height: 100%;
+
+        border: none;
+    }
+
+
+    /* PROJECT LIST: visible by default */
+    #projectList {
+        display: block;
+        padding: 0;
+    }
+
+
+    /* PROJECT DETAIL: hidden by default */
+    #projectShow {
+        display: none;
+
+        padding: 15px 20px 30px;
+
+        background-color: white;
+    }
+
+
+    /* When a project is selected */
+    body.project-open #projectList {
+        display: none;
+    }
+
+    body.project-open #projectShow {
+        display: block;
+    }
+
+
+    /* Close button */
+    .close-project {
+        display: flex;
+
+        position: sticky;
+        top: 0;
+
+        width: 44px;
+        height: 44px;
+
+        margin-left: auto;
+
+        align-items: center;
+        justify-content: center;
+
+        border: none;
+        background-color: white;
+
+        font-size: 34px;
+        line-height: 1;
+
+        cursor: pointer;
+
+        z-index: 20;
+    }
+
+
+    /* Gallery */
+    .gallery-grid {
+        grid-template-columns: 1fr;
+    }
+
+
+    /* Text */
+    .project-content h1 {
+        font-size: 26px;
+    }
+
+
+    /* Navigation */
+    .nav-content {
+        padding: 0 15px;
+    }
+
+}
+
+
+/* ======================================
+   INTRODUCTION
+====================================== */
+
+.introduction {
+    width: 100%;
+    max-width: 100%;
+}
+
+.intro-eyebrow {
+    font-size: 12px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+}
+
+.introduction h1 {
+    font-size: 38px;
+    line-height: 1.1;
+    margin: 0 0 20px;
+}
+
+.intro-description {
+    max-width: 650px;
+    font-size: 16px;
+    line-height: 1.7;
+    margin-bottom: 40px;
+}
+
+
+/* ======================================
+   INTRO IMAGES
+====================================== */
+
+.intro-gallery {
+    margin: 40px 0;
+}
+
+.intro-gallery h2,
+.intro-video h2 {
+    font-size: 20px;
+    margin-bottom: 18px;
+}
+
+.intro-images {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+}
+
+.intro-images figure {
+    width: 100%;
+    margin: 0;
+}
+
+.intro-images figure:last-child:nth-child(odd) {
+    grid-column: span 2;
+}
+
+.intro-images img {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
+
+/* ======================================
+   YOUTUBE VIDEO
+====================================== */
+
+.intro-video {
+    margin: 45px 0 20px;
+}
+
+.youtube-container {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    background: #000;
+}
+
+.youtube-container iframe {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+}
+
+
+/* ======================================
+   MOBILE
+====================================== */
+
+@media (max-width: 700px) {
+
+    .introduction h1 {
+        font-size: 28px;
+    }
+
+    .intro-images {
+        grid-template-columns: 1fr;
+    }
+
+    .intro-images figure:last-child:nth-child(odd) {
+        grid-column: auto;
+    }
+
 }
