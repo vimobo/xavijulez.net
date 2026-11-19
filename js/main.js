@@ -60,7 +60,7 @@ const translations = {
         introVideo: "Vídeo destacat",
 
         categories: {
-            live: "Directe",
+            live: "Live",
             video: "Vídeo"
         }
     }

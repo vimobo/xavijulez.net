@@ -208,6 +208,40 @@ main {
 }
 
 
+/* VIDEO: triangle pointing up */
+#filterTable td[data-filter="video"]::before {
+    content: "";
+    display: inline-block;
+
+    width: 0;
+    height: 0;
+
+    margin-right: 8px;
+
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-bottom: 9px solid black;
+
+    vertical-align: middle;
+}
+
+/* LIVE: triangle pointing down */
+#filterTable td[data-filter="live"]::before {
+    content: "";
+    display: inline-block;
+
+    width: 0;
+    height: 0;
+
+    margin-right: 8px;
+
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-top: 9px solid black;
+
+    vertical-align: middle;
+}
+
 /* ======================================
    PROJECT LIST
 ====================================== */
@@ -232,10 +266,6 @@ main {
     text-decoration: none;
 
     transition: background-color 0.2s;
-}
-
-#projectLi a:hover {
-    background-color: #f2f2f2;
 }
 
 #projectLi a.active {
@@ -592,3 +622,48 @@ main {
     }
 
 }
+
+
+/* ======================================
+   PROJECT TYPE SYMBOLS
+====================================== */
+
+#projectLi a {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+/* VIDEO: triangle pointing up */
+
+#projectLi li[data-type="video"] a::before {
+    content: "";
+
+    width: 0;
+    height: 0;
+
+    flex-shrink: 0;
+
+    border-left: 6px solid transparent;
+    border-right: 6px solid transparent;
+    border-bottom: 10px solid black;
+}
+
+/* LIVE: triangle pointing down */
+
+#projectLi li[data-type="live"] a::before {
+    content: "";
+
+    width: 0;
+    height: 0;
+
+    flex-shrink: 0;
+
+    border-left: 6px solid transparent;
+    border-right: 6px solid transparent;
+    border-top: 10px solid black;
+}
+
+/* ======================================
+   FILTER TYPE SYMBOLS
+====================================== */
