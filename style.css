@@ -54,8 +54,27 @@ header {
 }
 
 .nav-brand {
+    display: inline-flex;
+    align-items: center;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    font-family: inherit;
     font-size: 20px;
     font-weight: 700;
+    text-align: left;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.nav-brand:hover {
+    opacity: 0.7;
+}
+
+.nav-brand:focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: 4px;
 }
 
 /* ======================================
@@ -119,7 +138,6 @@ main {
 
 #projectList,
 #projectShow {
-    width: 50%;
     height: 100%;
     min-width: 0;
     min-height: 0;
@@ -127,10 +145,27 @@ main {
     overflow-y: auto;
     overscroll-behavior: contain;
     -webkit-overflow-scrolling: touch;
+
+    /* Hide the scrollbar without disabling scrolling. */
+    scrollbar-width: none;
+    -ms-overflow-style: none;
 }
 
+#projectList::-webkit-scrollbar,
+#projectShow::-webkit-scrollbar {
+    display: none;
+}
+
+/* Desktop proportions: 1/3 list and 2/3 project detail. */
 #projectList {
-    border-right: 1px solid #ddd;
+    flex: 0 0 33.3333%;
+    width: 33.3333%;
+    border-right: 0;
+}
+
+#projectShow {
+    flex: 0 0 66.6667%;
+    width: 66.6667%;
 }
 
 #projectShow {
@@ -138,20 +173,6 @@ main {
     padding: 30px;
 }
 
-#projectList::-webkit-scrollbar,
-#projectShow::-webkit-scrollbar {
-    width: 6px;
-}
-
-#projectList::-webkit-scrollbar-thumb,
-#projectShow::-webkit-scrollbar-thumb {
-    background: #bbb;
-}
-
-#projectList::-webkit-scrollbar-track,
-#projectShow::-webkit-scrollbar-track {
-    background: transparent;
-}
 
 /* ======================================
    FILTER TABLE
@@ -222,7 +243,7 @@ main {
 }
 
 #projectLi li {
-    border-bottom: 1px solid #eee;
+    border: 0;
 }
 
 #projectLi a {
@@ -232,23 +253,15 @@ main {
     padding: 20px 25px;
     color: inherit;
     text-decoration: none;
-    transition: background-color 0.2s ease;
 }
 
-#projectLi a:hover,
-#projectLi a.active {
-    background: #f2f2f2;
+#projectLi a:hover {
+    background: transparent;
 }
 
 #projectLi a.active {
     font-weight: 700;
-}
-
-/* Introduction item is not a project category. */
-#projectLi li.intro-list-item a::before {
-    flex: 0 0 auto;
-    content: "►";
-    font-size: 10px;
+    background: transparent;
 }
 
 /* Video project: triangle pointing up */
@@ -381,6 +394,48 @@ main {
 
 .project-content > a:hover {
     background: #444;
+}
+
+/* ======================================
+   INTRODUCTION PROJECT GRID
+====================================== */
+
+.intro-project-gallery {
+    width: 100%;
+    margin: 40px 0;
+}
+
+.intro-project-gallery h2 {
+    margin: 0 0 18px;
+    font-size: 22px;
+}
+
+.intro-project-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+    width: 100%;
+    align-items: start;
+}
+
+.intro-project-card {
+    display: block;
+    min-width: 0;
+    overflow: hidden;
+    color: inherit;
+    text-decoration: none;
+}
+
+.intro-project-card img {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+    transition: opacity 0.2s ease;
+}
+
+.intro-project-card:hover img {
+    opacity: 0.78;
 }
 
 /* ======================================
@@ -530,6 +585,11 @@ main {
 
     .gallery-grid {
         grid-template-columns: 1fr;
+    }
+
+    .intro-project-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 7px;
     }
 
     .project-content h1 {

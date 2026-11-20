@@ -8,6 +8,20 @@ const projectLi = document.getElementById("projectLi");
 const filterTable = document.getElementById("filterTable");
 const languageButtons = document.querySelectorAll("[data-language]");
 
+// The site title belongs in the navigation, not above the project filters.
+let navBrand = document.querySelector(".nav-brand");
+
+if (!navBrand) {
+    const navContent = document.querySelector(".nav-content");
+
+    if (navContent) {
+        navBrand = document.createElement("button");
+        navBrand.className = "nav-brand";
+        navBrand.type = "button";
+        navContent.prepend(navBrand);
+    }
+}
+
 /* ======================================
    CONFIGURATION AND STATE
 ====================================== */
@@ -29,7 +43,6 @@ const translations = {
         introAboutTitle: "About",
         introAboutText: "Working with image, light, colour and visual storytelling, Xavi develops cinematic approaches across different audiovisual formats, from commercial productions to independent film.",
         introContact: "More information & contact",
-        introListTitle: "Introduction",
         backToProjects: "Back",
         projectNotFound: "Project not found",
         gallery: "Gallery",
@@ -45,7 +58,6 @@ const translations = {
         introAboutTitle: "Sobre",
         introAboutText: "Treballant amb la imatge, la llum, el color i la narrativa visual, Xavi desenvolupa enfocaments cinematogràfics en diferents formats audiovisuals, des de produccions comercials fins al cinema independent.",
         introContact: "Més informació i contacte",
-        introListTitle: "Introducció",
         backToProjects: "Tornar",
         projectNotFound: "No s'ha trobat el projecte",
         gallery: "Galeria",
@@ -109,31 +121,69 @@ function isMobile() {
 }
 
 /* ======================================
+   INTRODUCTION PROJECT PREVIEWS
+====================================== */
+
+function getImageSource(imageValue) {
+    const src = typeof imageValue === "string"
+        ? imageValue
+        : imageValue?.src;
+
+    return safeUrl(src);
+}
+
+function getProjectPreview(project) {
+    if (!project || typeof project !== "object") {
+        return null;
+    }
+
+    // Prefer an explicitly configured cover/thumbnail.
+    const directCandidates = [project.thumbnail, project.cover, project.image];
+
+    for (const candidate of directCandidates) {
+        const src = getImageSource(candidate);
+        if (src) {
+            return {
+                src,
+                alt: getText(candidate?.alt).trim() || getText(project.title).trim()
+            };
+        }
+    }
+
+    // Otherwise use the first image in the project's gallery.
+    if (Array.isArray(project.gallery)) {
+        for (const candidate of project.gallery) {
+            const src = getImageSource(candidate);
+            if (src) {
+                return {
+                    src,
+                    alt: getText(candidate?.alt).trim() || getText(project.title).trim()
+                };
+            }
+        }
+    }
+
+    // Finally, look for the first image in the project's sections.
+    if (Array.isArray(project.sections)) {
+        for (const section of project.sections) {
+            const src = getImageSource(section?.image);
+            if (src) {
+                return {
+                    src,
+                    alt: getText(section?.imageAlt).trim() || getText(project.title).trim()
+                };
+            }
+        }
+    }
+
+    return null;
+}
+
+/* ======================================
    INTRODUCTION
 ====================================== */
 
 function renderIntroduction() {
-    // Vumbnail provides image thumbnails for public Vimeo videos.
-    // If one thumbnail fails to load, the failed image is removed.
-    const introImages = [
-        {
-            src: "https://vumbnail.com/1090410215.jpg",
-            alt: "Pull&Bear Face ID campaign"
-        },
-        {
-            src: "https://vumbnail.com/1090413878.jpg",
-            alt: "Pull&Bear Canvas for Creativity campaign"
-        },
-        {
-            src: "https://vumbnail.com/1125343378.jpg",
-            alt: "Sitges Film Festival 2025"
-        },
-        {
-            src: "https://vumbnail.com/1128822913.jpg",
-            alt: "HOGAR SÍ campaign"
-        }
-    ];
-
     const introTitle = t("introTitle").trim();
     const introRole = t("introRole").trim();
     const introText = t("introText").trim();
@@ -142,6 +192,46 @@ function renderIntroduction() {
     const aboutTitle = t("introAboutTitle").trim();
     const aboutText = t("introAboutText").trim();
     const contactText = t("introContact").trim();
+
+    // Build a 3 x 3 visual index from the first nine projects that have images.
+    // Each image opens the matching project article through the existing SPA navigation.
+    const introProjects = projects
+        .map(project => ({
+            project,
+            preview: getProjectPreview(project)
+        }))
+        .filter(item => item.preview)
+        .slice(0, 9);
+
+    const introGrid = introProjects.length
+        ? `
+            <section class="intro-project-gallery">
+                ${galleryTitle ? `<h2>${escapeHTML(galleryTitle)}</h2>` : ""}
+                <div class="intro-project-grid">
+                    ${introProjects.map(({ project, preview }) => {
+                        const title = getText(project.title).trim() || `Project ${project.id}`;
+                        const alt = preview.alt || title;
+
+                        return `
+                            <a
+                                class="intro-project-card"
+                                href="?project=${encodeURIComponent(project.id)}"
+                                data-intro-project="${escapeHTML(project.id)}"
+                                aria-label="${escapeHTML(title)}"
+                            >
+                                <img
+                                    src="${escapeHTML(preview.src)}"
+                                    alt="${escapeHTML(alt)}"
+                                    loading="lazy"
+                                    referrerpolicy="no-referrer"
+                                >
+                            </a>
+                        `;
+                    }).join("")}
+                </div>
+            </section>
+        `
+        : "";
 
     const introContent = [
         introTitle ? `<h1>${escapeHTML(introTitle)}</h1>` : "",
@@ -163,7 +253,7 @@ function renderIntroduction() {
             </section>
         ` : "",
 
-        renderGallery(introImages, galleryTitle),
+        introGrid,
 
         (aboutTitle || aboutText) ? `
             <section class="project-section">
@@ -204,19 +294,28 @@ function updateMobileView() {
     document.body.classList.toggle("mobile-intro-open", mobileView === "intro");
     document.body.classList.toggle("mobile-list-open", mobileView === "list");
     document.body.classList.toggle("project-open", mobileView === "project");
-    updateActiveIntro();
 }
 
 /* ======================================
-   PROJECT LIST
+   NAVIGATION TITLE AND PROJECT LIST
 ====================================== */
 
+function updateNavBrand() {
+    if (!navBrand) {
+        return;
+    }
+
+    navBrand.textContent = t("introTitle") || "Xavi Julez";
+    navBrand.setAttribute("aria-label", "Go to introduction");
+
+    // Make an existing div/span behave like a keyboard-accessible home control.
+    if (navBrand.tagName !== "BUTTON" && navBrand.tagName !== "A") {
+        navBrand.setAttribute("role", "button");
+        navBrand.setAttribute("tabindex", "0");
+    }
+}
+
 function renderProjectList() {
-    const introItem = `
-        <li data-intro-item class="intro-list-item">
-            <a href="#" data-intro>${escapeHTML(t("introListTitle"))}</a>
-        </li>
-    `;
 
     const projectItems = projects.map(project => {
         const title = getText(project.title).trim() || `Project ${project.id}`;
@@ -231,22 +330,15 @@ function renderProjectList() {
         `;
     }).join("");
 
-    projectLi.innerHTML = introItem + projectItems;
+    // There is no Introduction list item. Xavi Julez is the list's H1.
+    projectLi.innerHTML = projectItems;
     updateActiveProject(currentProjectId);
-    updateActiveIntro();
 }
 
 function updateActiveProject(id) {
     projectLi.querySelectorAll("[data-project]").forEach(link => {
         link.classList.toggle("active", String(link.dataset.project) === String(id));
     });
-}
-
-function updateActiveIntro() {
-    const introLink = projectLi.querySelector("[data-intro]");
-    if (introLink) {
-        introLink.classList.toggle("active", mobileView === "intro");
-    }
 }
 
 /* ======================================
@@ -274,15 +366,8 @@ function renderFilters() {
 }
 
 function filterProjects(type = null) {
-    projectLi.querySelectorAll("li").forEach(item => {
-        // The introduction is always visible in the list.
-        if (item.hasAttribute("data-intro-item")) {
-            item.style.display = "";
-            return;
-        }
-
-        const itemType = item.dataset.type;
-        const matches = !type || itemType === type;
+    projectLi.querySelectorAll("li[data-type]").forEach(item => {
+        const matches = !type || item.dataset.type === type;
         item.style.display = matches ? "" : "none";
     });
 
@@ -397,6 +482,19 @@ projectShow.addEventListener("error", event => {
         return;
     }
 
+    const introCard = target.closest(".intro-project-card");
+    const introGallery = target.closest(".intro-project-gallery");
+
+    if (introCard) {
+        introCard.remove();
+
+        if (introGallery && !introGallery.querySelector(".intro-project-card")) {
+            introGallery.remove();
+        }
+
+        return;
+    }
+
     const figure = target.closest(".gallery-item");
     const gallery = target.closest(".project-gallery");
 
@@ -410,7 +508,6 @@ projectShow.addEventListener("error", event => {
         const section = target.closest(".project-section");
         target.remove();
 
-        // Remove the section too when the failed image was its only content.
         if (section && !section.querySelector("h2, p, video, iframe, a, img")) {
             section.remove();
         }
@@ -461,7 +558,6 @@ function renderProject(id) {
 
     currentProjectId = String(id);
     updateActiveProject(currentProjectId);
-    updateActiveIntro();
 }
 
 function renderCloseProjectButton() {
@@ -484,7 +580,6 @@ function renderEmptyProject() {
     projectShow.innerHTML = renderIntroduction();
     currentProjectId = null;
     updateActiveProject(null);
-    updateActiveIntro();
 }
 
 /* ======================================
@@ -593,18 +688,21 @@ filterTable.addEventListener("click", event => {
 });
 
 /* ======================================
-   PROJECT LIST EVENTS
+   NAVIGATION TITLE / PROJECT LIST EVENTS
 ====================================== */
 
+if (navBrand) {
+    navBrand.addEventListener("click", showIntroduction);
+
+    navBrand.addEventListener("keydown", event => {
+        if (event.key === "Enter" || event.key === " ") {
+            event.preventDefault();
+            showIntroduction();
+        }
+    });
+}
+
 projectLi.addEventListener("click", event => {
-    const introLink = event.target.closest("[data-intro]");
-
-    if (introLink) {
-        event.preventDefault();
-        showIntroduction();
-        return;
-    }
-
     const projectLink = event.target.closest("[data-project]");
 
     if (!projectLink) {
@@ -620,6 +718,14 @@ projectLi.addEventListener("click", event => {
 ====================================== */
 
 projectShow.addEventListener("click", event => {
+    const introProjectLink = event.target.closest("[data-intro-project]");
+
+    if (introProjectLink) {
+        event.preventDefault();
+        openProject(introProjectLink.dataset.introProject);
+        return;
+    }
+
     if (event.target.closest("#closeIntro")) {
         showProjectList();
         return;
@@ -662,6 +768,7 @@ function setLanguage(language) {
 
     document.documentElement.lang = language;
     updateLanguageSelector();
+    updateNavBrand();
     renderProjectList();
     renderFilters();
 
@@ -742,6 +849,7 @@ try {
 
 document.documentElement.lang = currentLanguage;
 updateLanguageSelector();
+updateNavBrand();
 renderProjectList();
 renderFilters();
 initPage();
