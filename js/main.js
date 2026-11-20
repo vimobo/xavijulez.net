@@ -6,13 +6,10 @@ const projectShow = document.getElementById("projectShow");
 const projectList = document.getElementById("projectList");
 const projectLi = document.getElementById("projectLi");
 const filterTable = document.getElementById("filterTable");
-
-const languageSelect = document.getElementById("languageSelect");
-const languageLabel = document.getElementById("languageLabel");
-
+const languageButtons = document.querySelectorAll("[data-language]");
 
 /* ======================================
-   STATE
+   CONFIGURATION AND STATE
 ====================================== */
 
 const PROJECT_TYPES = ["video", "live"];
@@ -20,783 +17,568 @@ const PROJECT_TYPES = ["video", "live"];
 let currentLanguage = "ca";
 let activeFilter = null;
 let currentProjectId = null;
-
-
-/* ======================================
-   TRANSLATIONS
-====================================== */
+let mobileView = "intro";
 
 const translations = {
     en: {
-        languageLabel: "Language",
-        selectProject: "Select a project",
+        introTitle: "Xavi Julez",
+        introRole: "DOP / COLOR GRADING",
+        introText: "Xavi Julez works across cinematography and colour grading, developing visual work for commercial campaigns, music videos and film productions.",
+        introFeatured: "Featured work",
+        introGallery: "Selected frames",
+        introAboutTitle: "About",
+        introAboutText: "Working with image, light, colour and visual storytelling, Xavi develops cinematic approaches across different audiovisual formats, from commercial productions to independent film.",
+        introContact: "More information & contact",
+        introListTitle: "Introduction",
+        backToProjects: "Back",
         projectNotFound: "Project not found",
         gallery: "Gallery",
-        visitProject: "Visit project",
-        backToProjects: "Back to projects",
-
-        introTitle: "Welcome to my portfolio",
-        introText: "A selection of creative projects, ideas and experiences. Explore my work and discover the stories behind each project.",
-        introGallery: "A glimpse of my work",
-        introVideo: "Featured video",
-
-        categories: {
-            live: "Live",
-            video: "Video"
-        }
+        visitProject: "Visit project"
     },
 
     ca: {
-        languageLabel: "Idioma",
-        selectProject: "Selecciona un projecte",
-        projectNotFound: "Projecte no trobat",
+        introTitle: "Xavi Julez",
+        introRole: "DIRECCIÓ DE FOTOGRAFIA / COLOR GRADING",
+        introText: "Xavi Julez treballa en l'àmbit de la direcció de fotografia i l'etalonatge, desenvolupant projectes visuals per a campanyes comercials, videoclips i produccions cinematogràfiques.",
+        introFeatured: "Treball destacat",
+        introGallery: "Fotogrames seleccionats",
+        introAboutTitle: "Sobre",
+        introAboutText: "Treballant amb la imatge, la llum, el color i la narrativa visual, Xavi desenvolupa enfocaments cinematogràfics en diferents formats audiovisuals, des de produccions comercials fins al cinema independent.",
+        introContact: "Més informació i contacte",
+        introListTitle: "Introducció",
+        backToProjects: "Tornar",
+        projectNotFound: "No s'ha trobat el projecte",
         gallery: "Galeria",
-        visitProject: "Visita el projecte",
-        backToProjects: "Torna als projectes",
-
-        introTitle: "Benvingut al meu portafoli",
-        introText: "Una selecció de projectes creatius, idees i experiències. Explora el meu treball i descobreix les històries que hi ha darrere de cada projecte.",
-        introGallery: "Una mostra del meu treball",
-        introVideo: "Vídeo destacat",
-
-        categories: {
-            live: "Live",
-            video: "Vídeo"
-        }
+        visitProject: "Veure projecte"
     }
 };
-
-/* ======================================
-   INTRODUCTION
-====================================== */
-
-function renderIntroduction() {
-
-    return `
-        <article class="introduction">
-
-            <p class="intro-eyebrow">
-                PORTFOLIO
-            </p>
-
-            <h1>
-                ${escapeHTML(t("introTitle"))}
-            </h1>
-
-            <p class="intro-description">
-                ${escapeHTML(t("introText"))}
-            </p>
-
-
-            <!-- SAMPLE IMAGES -->
-
-            <section class="intro-gallery">
-
-                <h2>
-                    ${escapeHTML(t("introGallery"))}
-                </h2>
-
-                <div class="intro-images">
-
-                    <figure>
-                        <img
-                            src="https://picsum.photos/seed/portfolio-01/1200/900"
-                            alt="Portfolio sample image 1"
-                            loading="lazy"
-                        >
-                    </figure>
-
-                    <figure>
-                        <img
-                            src="https://picsum.photos/seed/portfolio-02/1200/900"
-                            alt="Portfolio sample image 2"
-                            loading="lazy"
-                        >
-                    </figure>
-
-                    <figure>
-                        <img
-                            src="https://picsum.photos/seed/portfolio-03/1200/900"
-                            alt="Portfolio sample image 3"
-                            loading="lazy"
-                        >
-                    </figure>
-
-                </div>
-
-            </section>
-
-
-            <!-- YOUTUBE VIDEO -->
-
-            <section class="intro-video">
-
-                <h2>
-                    ${escapeHTML(t("introVideo"))}
-                </h2>
-
-                <div class="youtube-container">
-
-                    <iframe
-                        src="https://www.youtube-nocookie.com/embed/M7lc1UVf-VE"
-                        title="YouTube video player"
-                        loading="lazy"
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                        referrerpolicy="strict-origin-when-cross-origin"
-                        allowfullscreen
-                    ></iframe>
-
-                </div>
-
-            </section>
-
-        </article>
-    `;
-}
 
 /* ======================================
    HELPERS
 ====================================== */
 
 function escapeHTML(value) {
-
     return String(value ?? "").replace(/[&<>"']/g, character => ({
-
         "&": "&amp;",
         "<": "&lt;",
         ">": "&gt;",
         '"': "&quot;",
         "'": "&#039;"
-
     })[character]);
-
 }
 
-
 function getText(value) {
-
     if (typeof value === "string") {
         return value;
     }
 
-    if (value && typeof value === "object") {
-
-        return value[currentLanguage]
-            || value.en
-            || Object.values(value)[0]
-            || "";
-
+    if (value && typeof value === "object" && !Array.isArray(value)) {
+        return value[currentLanguage] || value.en || "";
     }
 
     return "";
-
 }
 
-
+// Return an empty string for missing translations instead of showing the key.
 function t(key) {
-
-    return translations[currentLanguage][key]
-        || translations.en[key]
-        || key;
-
+    return translations[currentLanguage]?.[key]
+        || translations.en?.[key]
+        || "";
 }
-
 
 function safeUrl(value) {
-
     if (typeof value !== "string" || !value.trim()) {
         return null;
     }
 
     try {
-
         const url = new URL(value.trim(), window.location.href);
 
-        if (
-            url.protocol === "http:" ||
-            url.protocol === "https:"
-        ) {
+        if (url.protocol === "http:" || url.protocol === "https:") {
             return value.trim();
         }
-
+    } catch (error) {
         return null;
-
-    } catch {
-
-        return null;
-
     }
 
+    return null;
 }
 
+function isMobile() {
+    return window.matchMedia("(max-width: 700px)").matches;
+}
+
+/* ======================================
+   INTRODUCTION
+====================================== */
+
+function renderIntroduction() {
+    // Vumbnail provides image thumbnails for public Vimeo videos.
+    // If one thumbnail fails to load, the failed image is removed.
+    const introImages = [
+        {
+            src: "https://vumbnail.com/1090410215.jpg",
+            alt: "Pull&Bear Face ID campaign"
+        },
+        {
+            src: "https://vumbnail.com/1090413878.jpg",
+            alt: "Pull&Bear Canvas for Creativity campaign"
+        },
+        {
+            src: "https://vumbnail.com/1125343378.jpg",
+            alt: "Sitges Film Festival 2025"
+        },
+        {
+            src: "https://vumbnail.com/1128822913.jpg",
+            alt: "HOGAR SÍ campaign"
+        }
+    ];
+
+    const introTitle = t("introTitle").trim();
+    const introRole = t("introRole").trim();
+    const introText = t("introText").trim();
+    const featuredTitle = t("introFeatured").trim();
+    const galleryTitle = t("introGallery").trim();
+    const aboutTitle = t("introAboutTitle").trim();
+    const aboutText = t("introAboutText").trim();
+    const contactText = t("introContact").trim();
+
+    const introContent = [
+        introTitle ? `<h1>${escapeHTML(introTitle)}</h1>` : "",
+        introRole ? `<h2>${escapeHTML(introRole)}</h2>` : "",
+        introText ? `<p class="project-description">${escapeHTML(introText)}</p>` : "",
+
+        featuredTitle ? `
+            <section class="project-section">
+                <h2>${escapeHTML(featuredTitle)}</h2>
+                <div class="video-container">
+                    <iframe
+                        src="https://player.vimeo.com/video/1125343378"
+                        title="Sitges Film Festival 2025"
+                        loading="lazy"
+                        allow="autoplay; fullscreen; picture-in-picture"
+                        allowfullscreen
+                    ></iframe>
+                </div>
+            </section>
+        ` : "",
+
+        renderGallery(introImages, galleryTitle),
+
+        (aboutTitle || aboutText) ? `
+            <section class="project-section">
+                ${aboutTitle ? `<h2>${escapeHTML(aboutTitle)}</h2>` : ""}
+                ${aboutText ? `<p>${escapeHTML(aboutText)}</p>` : ""}
+            </section>
+        ` : "",
+
+        contactText ? `
+            <section class="project-section">
+                <a href="https://linktr.ee/xavijulez" target="_blank" rel="noopener noreferrer">
+                    ${escapeHTML(contactText)} ↗
+                </a>
+            </section>
+        ` : ""
+    ].filter(Boolean).join("");
+
+    return `
+        <button
+            type="button"
+            class="close-intro"
+            id="closeIntro"
+            aria-label="${escapeHTML(t("backToProjects"))}"
+            title="${escapeHTML(t("backToProjects"))}"
+        >&times;</button>
+
+        <article class="project-content introduction">
+            ${introContent}
+        </article>
+    `;
+}
 
 /* ======================================
    MOBILE VIEW MANAGEMENT
 ====================================== */
 
 function updateMobileView() {
-
-    const hasProject =
-        currentProjectId !== null &&
-        currentProjectId !== undefined &&
-        currentProjectId !== "";
-
-    document.body.classList.toggle(
-        "project-open",
-        hasProject
-    );
-
+    document.body.classList.toggle("mobile-intro-open", mobileView === "intro");
+    document.body.classList.toggle("mobile-list-open", mobileView === "list");
+    document.body.classList.toggle("project-open", mobileView === "project");
+    updateActiveIntro();
 }
-
 
 /* ======================================
    PROJECT LIST
 ====================================== */
 
 function renderProjectList() {
+    const introItem = `
+        <li data-intro-item class="intro-list-item">
+            <a href="#" data-intro>${escapeHTML(t("introListTitle"))}</a>
+        </li>
+    `;
 
-    projectLi.innerHTML = projects.map(project => {
-
-        const title = getText(project.title)
-            || `Project ${project.id}`;
+    const projectItems = projects.map(project => {
+        const title = getText(project.title).trim() || `Project ${project.id}`;
+        const type = PROJECT_TYPES.includes(project.type) ? project.type : "";
 
         return `
-
-            <li data-type="${escapeHTML(project.type)}">
-
-                <a
-                    href="?project=${encodeURIComponent(project.id)}"
-                    data-project="${escapeHTML(project.id)}"
-                >
+            <li ${type ? `data-type="${escapeHTML(type)}"` : ""}>
+                <a href="?project=${encodeURIComponent(project.id)}" data-project="${escapeHTML(project.id)}">
                     ${escapeHTML(title)}
                 </a>
-
             </li>
-
         `;
-
     }).join("");
 
+    projectLi.innerHTML = introItem + projectItems;
     updateActiveProject(currentProjectId);
-
+    updateActiveIntro();
 }
-
 
 function updateActiveProject(id) {
-
     projectLi.querySelectorAll("[data-project]").forEach(link => {
-
-        link.classList.toggle(
-            "active",
-            String(link.dataset.project) === String(id)
-        );
-
+        link.classList.toggle("active", String(link.dataset.project) === String(id));
     });
-
 }
 
+function updateActiveIntro() {
+    const introLink = projectLi.querySelector("[data-intro]");
+    if (introLink) {
+        introLink.classList.toggle("active", mobileView === "intro");
+    }
+}
 
 /* ======================================
    FILTERS
 ====================================== */
 
 function renderFilters() {
+    // Filter labels deliberately stay the same in both languages.
+    const filterLabels = {
+        video: "Video",
+        live: "Live"
+    };
 
     filterTable.innerHTML = `
-
         <tbody>
-
             <tr>
-
                 ${PROJECT_TYPES.map(type => `
-
-                    <td data-filter="${type}">
-
-                        ${escapeHTML(
-                            translations[currentLanguage].categories[type]
-                        )}
-
-                    </td>
-
+                    <td data-filter="${type}">${filterLabels[type]}</td>
                 `).join("")}
-
             </tr>
-
         </tbody>
-
     `;
 
     updateActiveFilter(activeFilter);
-
 }
 
-
 function filterProjects(type = null) {
+    projectLi.querySelectorAll("li").forEach(item => {
+        // The introduction is always visible in the list.
+        if (item.hasAttribute("data-intro-item")) {
+            item.style.display = "";
+            return;
+        }
 
-    const projectItems = projectLi.querySelectorAll("li");
-
-    projectItems.forEach(item => {
-
-        const matches = !type || item.dataset.type === type;
-
+        const itemType = item.dataset.type;
+        const matches = !type || itemType === type;
         item.style.display = matches ? "" : "none";
-
     });
 
     updateActiveFilter(type);
-
 }
-
 
 function updateActiveFilter(type) {
-
     filterTable.querySelectorAll("[data-filter]").forEach(element => {
-
-        element.classList.toggle(
-            "active",
-            element.dataset.filter === type
-        );
-
+        element.classList.toggle("active", element.dataset.filter === type);
     });
-
 }
-
 
 /* ======================================
    PROJECT SECTIONS
 ====================================== */
 
 function renderSection(section = {}) {
+    if (!section || typeof section !== "object") {
+        return "";
+    }
 
-    const title = getText(section.title);
-    const text = getText(section.text);
-    const imageAlt = getText(section.imageAlt);
-
+    const title = getText(section.title).trim();
+    const text = getText(section.text).trim();
+    const imageAlt = getText(section.imageAlt).trim();
     const image = safeUrl(section.image);
     const video = safeUrl(section.video);
 
+    // Do not create a section if every optional field is empty or invalid.
+    if (!title && !text && !image && !video) {
+        return "";
+    }
+
     return `
-
         <section class="project-section">
-
-            ${title ? `
-
-                <h2>
-                    ${escapeHTML(title)}
-                </h2>
-
-            ` : ""}
-
-
-            ${text ? `
-
-                <p>
-                    ${escapeHTML(text)}
-                </p>
-
-            ` : ""}
-
-
+            ${title ? `<h2>${escapeHTML(title)}</h2>` : ""}
+            ${text ? `<p>${escapeHTML(text)}</p>` : ""}
             ${image ? `
-
                 <img
                     class="section-image"
                     src="${escapeHTML(image)}"
-                    alt="${escapeHTML(imageAlt || title || "")}"
+                    alt="${escapeHTML(imageAlt || title)}"
                     loading="lazy"
+                    referrerpolicy="no-referrer"
                 >
-
             ` : ""}
-
-
             ${video ? `
-
                 <video controls preload="metadata">
-
                     <source src="${escapeHTML(video)}">
-
                     Your browser does not support video.
-
                 </video>
-
             ` : ""}
-
         </section>
-
     `;
-
 }
 
-
 /* ======================================
-   PROJECT GALLERY
+   PHOTO GALLERY
 ====================================== */
 
-function renderGallery(images) {
-
+function renderGallery(images, heading = t("gallery")) {
     if (!Array.isArray(images) || images.length === 0) {
         return "";
     }
 
-    const galleryItems = images.map((item, index) => {
-
-        const image = typeof item === "string"
-            ? { src: item }
-            : item;
+    const items = images.map((item, index) => {
+        const image = typeof item === "string" ? { src: item } : item;
 
         if (!image || typeof image !== "object") {
             return "";
         }
 
         const src = safeUrl(image.src);
-
         if (!src) {
             return "";
         }
 
-        const alt = getText(image.alt)
-            || `Project image ${index + 1}`;
-
-        const caption = getText(image.caption);
+        const alt = getText(image.alt).trim() || `Project image ${index + 1}`;
+        const caption = getText(image.caption).trim();
 
         return `
-
             <figure class="gallery-item">
-
                 <img
                     src="${escapeHTML(src)}"
                     alt="${escapeHTML(alt)}"
                     loading="lazy"
+                    referrerpolicy="no-referrer"
                 >
-
-                ${caption ? `
-
-                    <figcaption>
-                        ${escapeHTML(caption)}
-                    </figcaption>
-
-                ` : ""}
-
+                ${caption ? `<figcaption>${escapeHTML(caption)}</figcaption>` : ""}
             </figure>
-
         `;
+    }).filter(Boolean).join("");
 
-    }).join("");
-
-    if (!galleryItems.trim()) {
+    if (!items) {
         return "";
     }
 
+    const cleanHeading = getText(heading).trim();
+
     return `
-
         <section class="project-gallery">
-
-            <h2>
-                ${escapeHTML(t("gallery"))}
-            </h2>
-
-            <div class="gallery-grid">
-
-                ${galleryItems}
-
-            </div>
-
+            ${cleanHeading ? `<h2>${escapeHTML(cleanHeading)}</h2>` : ""}
+            <div class="gallery-grid">${items}</div>
         </section>
-
     `;
-
 }
 
+// Remove failed images instead of leaving broken-image icons or alt text on screen.
+projectShow.addEventListener("error", event => {
+    const target = event.target;
+
+    if (!target || target.tagName !== "IMG") {
+        return;
+    }
+
+    const figure = target.closest(".gallery-item");
+    const gallery = target.closest(".project-gallery");
+
+    if (figure) {
+        figure.remove();
+
+        if (gallery && !gallery.querySelector(".gallery-item")) {
+            gallery.remove();
+        }
+    } else if (target.classList.contains("section-image")) {
+        const section = target.closest(".project-section");
+        target.remove();
+
+        // Remove the section too when the failed image was its only content.
+        if (section && !section.querySelector("h2, p, video, iframe, a, img")) {
+            section.remove();
+        }
+    }
+}, true);
 
 /* ======================================
    PROJECT RENDERING
 ====================================== */
 
 function renderProject(id) {
+    const project = projects.find(item => String(item.id) === String(id));
 
-    const project = projects.find(item =>
-        String(item.id) === String(id)
-    );
+    if (!project) {
+        projectShow.innerHTML = `
+            ${renderCloseProjectButton()}
+            <p>${escapeHTML(t("projectNotFound"))}</p>
+        `;
+        currentProjectId = null;
+        updateActiveProject(null);
+        return;
+    }
 
-    const closeButton = `
+    const title = getText(project.title).trim();
+    const description = getText(project.description).trim();
+    const sectionsHTML = Array.isArray(project.sections)
+        ? project.sections.map(renderSection).filter(Boolean).join("")
+        : "";
+    const galleryHTML = renderGallery(project.gallery);
+    const projectUrl = safeUrl(project.url);
 
+    const content = [
+        title ? `<h1>${escapeHTML(title)}</h1>` : "",
+        description ? `<p class="project-description">${escapeHTML(description)}</p>` : "",
+        sectionsHTML,
+        galleryHTML,
+        projectUrl ? `
+            <a href="${escapeHTML(projectUrl)}" target="_blank" rel="noopener noreferrer">
+                ${escapeHTML(t("visitProject"))}
+            </a>
+        ` : ""
+    ].filter(Boolean).join("");
+
+    projectShow.innerHTML = `
+        ${renderCloseProjectButton()}
+        ${content ? `<article class="project-content">${content}</article>` : ""}
+    `;
+
+    currentProjectId = String(id);
+    updateActiveProject(currentProjectId);
+    updateActiveIntro();
+}
+
+function renderCloseProjectButton() {
+    return `
         <button
             type="button"
             class="close-project"
             id="closeProject"
             aria-label="${escapeHTML(t("backToProjects"))}"
             title="${escapeHTML(t("backToProjects"))}"
-        >
-            &times;
-        </button>
-
+        >&times;</button>
     `;
-
-
-    if (!project) {
-
-        projectShow.innerHTML = `
-
-            ${closeButton}
-
-            <h2>
-                ${escapeHTML(t("projectNotFound"))}
-            </h2>
-
-        `;
-
-        currentProjectId = id;
-
-        updateActiveProject(null);
-        updateMobileView();
-
-        return;
-
-    }
-
-
-    const title = getText(project.title);
-    const description = getText(project.description);
-
-    const projectUrl = safeUrl(project.url);
-
-
-    projectShow.innerHTML = `
-
-        ${closeButton}
-
-        <article class="project-content">
-
-
-            ${title ? `
-
-                <h1>
-                    ${escapeHTML(title)}
-                </h1>
-
-            ` : ""}
-
-
-            ${description ? `
-
-                <p class="project-description">
-                    ${escapeHTML(description)}
-                </p>
-
-            ` : ""}
-
-
-            ${Array.isArray(project.sections)
-
-                ? project.sections.map(section =>
-                    renderSection(section)
-                ).join("")
-
-                : ""
-
-            }
-
-
-            ${renderGallery(project.gallery)}
-
-
-            ${projectUrl ? `
-
-                <a
-                    href="${escapeHTML(projectUrl)}"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                >
-
-                    ${escapeHTML(t("visitProject"))}
-
-                </a>
-
-            ` : ""}
-
-
-        </article>
-
-    `;
-
-
-    currentProjectId = id;
-
-    updateActiveProject(id);
-    updateMobileView();
-
 }
 
-
 /* ======================================
-   EMPTY PROJECT VIEW
+   INTRODUCTION VIEW
 ====================================== */
 
 function renderEmptyProject() {
-
     projectShow.innerHTML = renderIntroduction();
-
     currentProjectId = null;
-
     updateActiveProject(null);
-    updateMobileView();
-
+    updateActiveIntro();
 }
 
-
 /* ======================================
-   URL MANAGEMENT
+   URL AND HISTORY
 ====================================== */
 
-function updateURL(projectId = null, filter = null) {
-
+function updateURL(projectId = null, filter = null, view = mobileView, replace = false) {
     const url = new URL(window.location.href);
 
-
-    if (projectId !== null && projectId !== undefined) {
-
+    if (projectId !== null && projectId !== undefined && projectId !== "") {
         url.searchParams.set("project", projectId);
-
     } else {
-
         url.searchParams.delete("project");
-
     }
-
 
     if (filter) {
-
         url.searchParams.set("filter", filter);
-
     } else {
-
         url.searchParams.delete("filter");
-
     }
 
+    const state = {
+        project: projectId || null,
+        filter: filter || null,
+        view
+    };
 
-    const newURL =
-        url.pathname +
-        url.search +
-        url.hash;
+    const newURL = url.pathname + url.search + url.hash;
+    const currentURL = window.location.pathname + window.location.search + window.location.hash;
+    const oldState = history.state || {};
 
-    const currentURL =
-        window.location.pathname +
-        window.location.search +
-        window.location.hash;
+    const sameState = oldState.project === state.project
+        && oldState.filter === state.filter
+        && oldState.view === state.view;
 
-
-    if (newURL === currentURL) {
+    if (newURL === currentURL && sameState) {
         return;
     }
 
-
-    history.pushState(
-
-        {
-            project: projectId,
-            filter: filter
-        },
-
-        "",
-
-        newURL
-
-    );
-
+    if (replace) {
+        history.replaceState(state, "", newURL);
+    } else {
+        history.pushState(state, "", newURL);
+    }
 }
 
-
 /* ======================================
-   NAVIGATION
+   VIEW NAVIGATION
 ====================================== */
 
-function navigate(projectId = null, filter = activeFilter) {
+function showIntroduction() {
+    renderEmptyProject();
+    mobileView = "intro";
+    filterProjects(activeFilter);
+    updateMobileView();
+    updateURL(null, activeFilter, "intro");
+}
 
-    const hasProject =
-        projectId !== null &&
-        projectId !== undefined &&
-        projectId !== "";
+function showProjectList() {
+    // Keep the introduction rendered behind the list for desktop layout.
+    renderEmptyProject();
+    mobileView = "list";
+    filterProjects(activeFilter);
+    updateMobileView();
+    updateURL(null, activeFilter, "list");
+}
 
-    const nextProjectId = hasProject
-        ? String(projectId)
-        : null;
+function openProject(id) {
+    const previousProjectId = currentProjectId;
+    renderProject(id);
+    mobileView = "project";
 
-    const projectChanged =
-        String(currentProjectId ?? "") !== String(nextProjectId ?? "");
-
-
-    activeFilter = filter || null;
-
-
-    if (hasProject) {
-
-        renderProject(nextProjectId);
-
-    } else {
-
-        renderEmptyProject();
-
-    }
-
-
-    // Reset detail scroll only when changing project
-    if (projectChanged) {
-
+    if (String(previousProjectId) !== String(id)) {
         projectShow.scrollTop = 0;
-
     }
-
 
     filterProjects(activeFilter);
-
-    updateURL(nextProjectId, activeFilter);
-
+    updateMobileView();
+    updateURL(id, activeFilter, "project");
 }
 
-
-/* ======================================
-   PROJECT LINKS
-====================================== */
-
-projectLi.addEventListener("click", event => {
-
-    const link = event.target.closest("[data-project]");
-
-    if (!link) {
-        return;
+function closeProject() {
+    if (isMobile()) {
+        showProjectList();
+    } else {
+        showIntroduction();
     }
-
-    event.preventDefault();
-
-    navigate(link.dataset.project, activeFilter);
-
-});
-
-
-/* ======================================
-   CLOSE PROJECT
-====================================== */
-
-projectShow.addEventListener("click", event => {
-
-    const closeButton = event.target.closest("#closeProject");
-
-    if (!closeButton) {
-        return;
-    }
-
-    navigate(null, activeFilter);
-
-});
-
+}
 
 /* ======================================
    FILTER EVENTS
 ====================================== */
 
 filterTable.addEventListener("click", event => {
-
     const filterElement = event.target.closest("[data-filter]");
 
     if (!filterElement) {
@@ -804,159 +586,162 @@ filterTable.addEventListener("click", event => {
     }
 
     const clickedFilter = filterElement.dataset.filter;
+    activeFilter = activeFilter === clickedFilter ? null : clickedFilter;
 
-    const nextFilter = activeFilter === clickedFilter
-        ? null
-        : clickedFilter;
-
-    const params = new URLSearchParams(window.location.search);
-
-    const projectId = params.get("project");
-
-    navigate(projectId, nextFilter);
-
+    filterProjects(activeFilter);
+    updateURL(currentProjectId, activeFilter, mobileView);
 });
 
+/* ======================================
+   PROJECT LIST EVENTS
+====================================== */
+
+projectLi.addEventListener("click", event => {
+    const introLink = event.target.closest("[data-intro]");
+
+    if (introLink) {
+        event.preventDefault();
+        showIntroduction();
+        return;
+    }
+
+    const projectLink = event.target.closest("[data-project]");
+
+    if (!projectLink) {
+        return;
+    }
+
+    event.preventDefault();
+    openProject(projectLink.dataset.project);
+});
+
+/* ======================================
+   DETAIL CLOSE EVENTS
+====================================== */
+
+projectShow.addEventListener("click", event => {
+    if (event.target.closest("#closeIntro")) {
+        showProjectList();
+        return;
+    }
+
+    if (event.target.closest("#closeProject")) {
+        closeProject();
+    }
+});
 
 /* ======================================
    LANGUAGE MANAGEMENT
 ====================================== */
 
-function setLanguage(language) {
+function updateLanguageSelector() {
+    languageButtons.forEach(button => {
+        const selected = button.dataset.language === currentLanguage;
+        button.classList.toggle("active", selected);
+        button.setAttribute("aria-pressed", String(selected));
+    });
+}
 
-    if (!translations[language]) {
+function setLanguage(language) {
+    if (!translations[language] || language === currentLanguage) {
         return;
     }
 
-
     const listScroll = projectList.scrollTop;
     const detailScroll = projectShow.scrollTop;
-
+    const previousView = mobileView;
+    const previousProjectId = currentProjectId;
 
     currentLanguage = language;
 
-
     try {
-
         localStorage.setItem("siteLanguage", language);
-
     } catch (error) {
-
         console.warn("Could not save language preference.", error);
-
     }
 
-
     document.documentElement.lang = language;
-
-    languageSelect.value = language;
-
-    languageLabel.textContent = t("languageLabel");
-
-
+    updateLanguageSelector();
     renderProjectList();
     renderFilters();
 
-    initPage();
+    if (previousProjectId) {
+        renderProject(previousProjectId);
+    } else {
+        renderEmptyProject();
+    }
 
+    mobileView = previousView;
+    filterProjects(activeFilter);
+    updateMobileView();
+    updateURL(previousProjectId, activeFilter, previousView, true);
 
-    // Restore scroll positions
     projectList.scrollTop = listScroll;
     projectShow.scrollTop = detailScroll;
-
 }
 
-
-languageSelect.addEventListener("change", event => {
-
-    setLanguage(event.target.value);
-
+languageButtons.forEach(button => {
+    button.addEventListener("click", () => {
+        setLanguage(button.dataset.language);
+    });
 });
 
-
-
-
 /* ======================================
-   INITIAL PAGE / BROWSER HISTORY
+   INITIALIZATION / BROWSER HISTORY
 ====================================== */
 
-function initPage() {
-
+function initPage(fromHistory = false) {
     const params = new URLSearchParams(window.location.search);
+    const requestedProjectId = params.get("project");
+    const requestedFilter = params.get("filter");
 
-    const projectId = params.get("project");
-    const filter = params.get("filter");
-
-
-    const validFilter = PROJECT_TYPES.includes(filter)
-        ? filter
+    activeFilter = PROJECT_TYPES.includes(requestedFilter)
+        ? requestedFilter
         : null;
 
+    const projectExists = requestedProjectId
+        && projects.some(project => String(project.id) === String(requestedProjectId));
 
-    const projectChanged =
-        String(currentProjectId ?? "") !== String(projectId ?? "");
-
-
-    activeFilter = validFilter;
-
-
-    if (projectId) {
-
-        renderProject(projectId);
-
+    if (projectExists) {
+        renderProject(requestedProjectId);
+        mobileView = "project";
     } else {
-
         renderEmptyProject();
-
+        mobileView = fromHistory && history.state?.view === "list"
+            ? "list"
+            : "intro";
     }
-
-
-    if (projectChanged) {
-
-        projectShow.scrollTop = 0;
-
-    }
-
 
     filterProjects(activeFilter);
-
     updateMobileView();
 
+    // Remove an invalid project parameter, if there is one.
+    if (requestedProjectId && !projectExists) {
+        updateURL(null, activeFilter, mobileView, true);
+    } else if (!fromHistory) {
+        updateURL(projectExists ? requestedProjectId : null, activeFilter, mobileView, true);
+    }
 }
 
-
-// Browser back and forward
-window.addEventListener("popstate", initPage);
-
+window.addEventListener("popstate", () => {
+    initPage(true);
+});
 
 /* ======================================
-   INITIALIZATION
+   STARTUP
 ====================================== */
 
 try {
-
     const savedLanguage = localStorage.getItem("siteLanguage");
-
     if (savedLanguage && translations[savedLanguage]) {
         currentLanguage = savedLanguage;
     }
-
 } catch (error) {
-
     console.warn("Could not read saved language preference.", error);
-
 }
 
-
-languageSelect.value = currentLanguage;
-
-languageLabel.textContent = t("languageLabel");
-
 document.documentElement.lang = currentLanguage;
-
-
+updateLanguageSelector();
 renderProjectList();
-
 renderFilters();
-
 initPage();

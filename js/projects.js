@@ -67,7 +67,7 @@ const projects = [
             ca: "04.07.2025 — Un lloc entremig"
         },
 
-        type: "video",
+        type: "live",
 
         description: {
             en: "A short film about spaces, transitions and the relationship between people and their surroundings.",

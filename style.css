@@ -8,44 +8,34 @@
 
 html,
 body {
-    margin: 0;
-    padding: 0;
-
     width: 100%;
     height: 100%;
-
-    font-family: Arial, Helvetica, sans-serif;
-
+    margin: 0;
+    padding: 0;
+    font-family: "Archivo", Arial, Helvetica, sans-serif;
     color: #111;
-    background-color: #fff;
+    background: #fff;
 }
 
 body {
-    height: 100vh;
-    height: 100dvh;
-
     display: flex;
     flex-direction: column;
-
+    height: 100vh;
+    height: 100dvh;
     overflow: hidden;
 }
-
 
 /* ======================================
    HEADER / NAVIGATION
 ====================================== */
 
 header {
-    width: 100%;
-    height: 70px;
-    min-height: 70px;
-
-    flex-shrink: 0;
-
     position: relative;
     z-index: 1000;
-
-    background-color: white;
+    flex: 0 0 70px;
+    width: 100%;
+    height: 70px;
+    background: #fff;
     border-bottom: 1px solid #ddd;
 }
 
@@ -55,21 +45,18 @@ header {
 }
 
 .nav-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
     width: 100%;
     height: 100%;
-
     padding: 0 30px;
-
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
 }
 
 .nav-brand {
     font-size: 20px;
-    font-weight: bold;
+    font-weight: 700;
 }
-
 
 /* ======================================
    LANGUAGE SELECTOR
@@ -78,51 +65,53 @@ header {
 .language-selector {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
 }
 
-.language-selector label {
+.language-selector span {
+    color: #999;
     font-size: 13px;
 }
 
-.language-selector select {
-    padding: 8px 12px;
-
-    font-size: 14px;
-
-    background-color: white;
-    border: 1px solid #ccc;
-
+.language-option {
+    padding: 5px 0;
+    border: 0;
+    background: transparent;
+    color: #999;
+    font: inherit;
+    font-size: 13px;
     cursor: pointer;
+    transition: color 0.2s ease;
 }
 
+.language-option.active,
+.language-option:hover {
+    color: #111;
+}
+
+.language-option.active {
+    font-weight: 700;
+}
 
 /* ======================================
    MAIN LAYOUT
 ====================================== */
 
 main {
-    flex: 1;
-
+    flex: 1 1 auto;
     width: 100%;
     min-height: 0;
-
     overflow: hidden;
 }
 
 #main {
-    position: relative;
-
     display: flex;
     flex-direction: row;
-
     width: 100%;
     height: 100%;
     min-height: 0;
-
     overflow: hidden;
 }
-
 
 /* ======================================
    INDEPENDENT SCROLL
@@ -132,11 +121,10 @@ main {
 #projectShow {
     width: 50%;
     height: 100%;
+    min-width: 0;
     min-height: 0;
-
-    overflow-y: auto;
     overflow-x: hidden;
-
+    overflow-y: auto;
     overscroll-behavior: contain;
     -webkit-overflow-scrolling: touch;
 }
@@ -146,11 +134,9 @@ main {
 }
 
 #projectShow {
+    position: relative;
     padding: 30px;
 }
-
-
-/* Scrollbar */
 
 #projectList::-webkit-scrollbar,
 #projectShow::-webkit-scrollbar {
@@ -159,86 +145,69 @@ main {
 
 #projectList::-webkit-scrollbar-thumb,
 #projectShow::-webkit-scrollbar-thumb {
-    background-color: #bbb;
+    background: #bbb;
 }
 
 #projectList::-webkit-scrollbar-track,
 #projectShow::-webkit-scrollbar-track {
-    background-color: transparent;
+    background: transparent;
 }
-
 
 /* ======================================
    FILTER TABLE
 ====================================== */
 
 #filterTable {
-    width: 100%;
-
-    border-collapse: collapse;
-    table-layout: fixed;
-
     position: sticky;
     top: 0;
     z-index: 10;
-
-    background-color: white;
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+    background: #fff;
 }
 
 #filterTable td {
     padding: 18px 10px;
-
+    border-bottom: 2px solid transparent;
     text-align: center;
     font-size: 14px;
-
     cursor: pointer;
-
-    border-bottom: 2px solid transparent;
-
-    transition: background-color 0.2s, border-color 0.2s;
+    transition: background-color 0.2s ease, border-color 0.2s ease;
 }
 
 #filterTable td:hover {
-    background-color: #f2f2f2;
+    background: #f2f2f2;
 }
 
 #filterTable td.active {
-    border-bottom: 2px solid black;
-    font-weight: bold;
+    border-bottom-color: #111;
+    font-weight: 700;
 }
 
-
-/* VIDEO: triangle pointing up */
+/* Video filter: triangle pointing up */
 #filterTable td[data-filter="video"]::before {
-    content: "";
     display: inline-block;
-
     width: 0;
     height: 0;
-
     margin-right: 8px;
-
-    border-left: 5px solid transparent;
     border-right: 5px solid transparent;
-    border-bottom: 9px solid black;
-
+    border-bottom: 9px solid #111;
+    border-left: 5px solid transparent;
+    content: "";
     vertical-align: middle;
 }
 
-/* LIVE: triangle pointing down */
+/* Live filter: triangle pointing down */
 #filterTable td[data-filter="live"]::before {
-    content: "";
     display: inline-block;
-
     width: 0;
     height: 0;
-
     margin-right: 8px;
-
-    border-left: 5px solid transparent;
+    border-top: 9px solid #111;
     border-right: 5px solid transparent;
-    border-top: 9px solid black;
-
+    border-left: 5px solid transparent;
+    content: "";
     vertical-align: middle;
 }
 
@@ -247,10 +216,9 @@ main {
 ====================================== */
 
 #projectLi {
-    list-style: none;
-
     margin: 0;
     padding: 0;
+    list-style: none;
 }
 
 #projectLi li {
@@ -258,24 +226,55 @@ main {
 }
 
 #projectLi a {
-    display: block;
-
+    display: flex;
+    align-items: center;
+    gap: 14px;
     padding: 20px 25px;
-
     color: inherit;
     text-decoration: none;
+    transition: background-color 0.2s ease;
+}
 
-    transition: background-color 0.2s;
+#projectLi a:hover,
+#projectLi a.active {
+    background: #f2f2f2;
 }
 
 #projectLi a.active {
-    font-weight: bold;
-    background-color: #f2f2f2;
+    font-weight: 700;
 }
 
+/* Introduction item is not a project category. */
+#projectLi li.intro-list-item a::before {
+    flex: 0 0 auto;
+    content: "►";
+    font-size: 10px;
+}
+
+/* Video project: triangle pointing up */
+#projectLi li[data-type="video"] a::before {
+    flex: 0 0 auto;
+    width: 0;
+    height: 0;
+    border-right: 6px solid transparent;
+    border-bottom: 10px solid #111;
+    border-left: 6px solid transparent;
+    content: "";
+}
+
+/* Live project: triangle pointing down */
+#projectLi li[data-type="live"] a::before {
+    flex: 0 0 auto;
+    width: 0;
+    height: 0;
+    border-top: 10px solid #111;
+    border-right: 6px solid transparent;
+    border-left: 6px solid transparent;
+    content: "";
+}
 
 /* ======================================
-   PROJECT DETAIL
+   PROJECT CONTENT
 ====================================== */
 
 .project-content {
@@ -286,39 +285,24 @@ main {
 .project-content h1 {
     margin-top: 0;
     margin-bottom: 20px;
-
     font-size: 32px;
+}
+
+.project-content h2 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    font-size: 22px;
 }
 
 .project-description {
     margin-bottom: 40px;
-
     font-size: 16px;
     line-height: 1.6;
 }
 
-
-/* ======================================
-   CLOSE PROJECT BUTTON
-====================================== */
-
-.close-project {
-    display: none;
-}
-
-
-/* ======================================
-   PROJECT SECTIONS
-====================================== */
-
 .project-section {
     width: 100%;
     margin-bottom: 40px;
-}
-
-.project-section h2 {
-    margin-bottom: 15px;
-    font-size: 22px;
 }
 
 .project-section p {
@@ -340,7 +324,6 @@ main {
     margin-top: 20px;
 }
 
-
 /* ======================================
    PHOTO GALLERY
 ====================================== */
@@ -358,11 +341,9 @@ main {
 .gallery-grid {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-
-    gap: 14px;
-
-    width: 100%;
     align-items: start;
+    gap: 14px;
+    width: 100%;
 }
 
 .gallery-item {
@@ -373,7 +354,6 @@ main {
 
 .gallery-item img {
     display: block;
-
     width: 100%;
     max-width: 100%;
     height: auto;
@@ -381,212 +361,33 @@ main {
 
 .gallery-item figcaption {
     padding: 8px 0;
-
     font-size: 13px;
     line-height: 1.4;
 }
 
-
 /* ======================================
-   PROJECT LINK
+   PROJECT LINKS
 ====================================== */
 
 .project-content > a {
     display: inline-block;
-
     margin-top: 20px;
     padding: 12px 20px;
-
-    color: white;
-    background-color: black;
-
+    color: #fff;
+    background: #111;
     text-decoration: none;
-
-    transition: background-color 0.2s;
+    transition: background-color 0.2s ease;
 }
 
 .project-content > a:hover {
-    background-color: #444;
+    background: #444;
 }
-
 
 /* ======================================
-   MOBILE LAYOUT
+   VIDEO EMBED
 ====================================== */
 
-@media (max-width: 700px) {
-
-    /* Main takes the full available space */
-    #main {
-        position: relative;
-        display: block;
-    }
-
-
-    /* Both views occupy the complete available area */
-    #projectList,
-    #projectShow {
-        position: absolute;
-
-        top: 0;
-        left: 0;
-
-        width: 100%;
-        height: 100%;
-
-        border: none;
-    }
-
-
-    /* PROJECT LIST: visible by default */
-    #projectList {
-        display: block;
-        padding: 0;
-    }
-
-
-    /* PROJECT DETAIL: hidden by default */
-    #projectShow {
-        display: none;
-
-        padding: 15px 20px 30px;
-
-        background-color: white;
-    }
-
-
-    /* When a project is selected */
-    body.project-open #projectList {
-        display: none;
-    }
-
-    body.project-open #projectShow {
-        display: block;
-    }
-
-
-    /* Close button */
-    .close-project {
-        display: flex;
-
-        position: sticky;
-        top: 0;
-
-        width: 44px;
-        height: 44px;
-
-        margin-left: auto;
-
-        align-items: center;
-        justify-content: center;
-
-        border: none;
-        background-color: white;
-
-        font-size: 34px;
-        line-height: 1;
-
-        cursor: pointer;
-
-        z-index: 20;
-    }
-
-
-    /* Gallery */
-    .gallery-grid {
-        grid-template-columns: 1fr;
-    }
-
-
-    /* Text */
-    .project-content h1 {
-        font-size: 26px;
-    }
-
-
-    /* Navigation */
-    .nav-content {
-        padding: 0 15px;
-    }
-
-}
-
-
-/* ======================================
-   INTRODUCTION
-====================================== */
-
-.introduction {
-    width: 100%;
-    max-width: 100%;
-}
-
-.intro-eyebrow {
-    font-size: 12px;
-    letter-spacing: 3px;
-    text-transform: uppercase;
-    margin-bottom: 20px;
-}
-
-.introduction h1 {
-    font-size: 38px;
-    line-height: 1.1;
-    margin: 0 0 20px;
-}
-
-.intro-description {
-    max-width: 650px;
-    font-size: 16px;
-    line-height: 1.7;
-    margin-bottom: 40px;
-}
-
-
-/* ======================================
-   INTRO IMAGES
-====================================== */
-
-.intro-gallery {
-    margin: 40px 0;
-}
-
-.intro-gallery h2,
-.intro-video h2 {
-    font-size: 20px;
-    margin-bottom: 18px;
-}
-
-.intro-images {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 12px;
-}
-
-.intro-images figure {
-    width: 100%;
-    margin: 0;
-}
-
-.intro-images figure:last-child:nth-child(odd) {
-    grid-column: span 2;
-}
-
-.intro-images img {
-    display: block;
-    width: 100%;
-    height: auto;
-}
-
-
-/* ======================================
-   YOUTUBE VIDEO
-====================================== */
-
-.intro-video {
-    margin: 45px 0 20px;
-}
-
-.youtube-container {
+.video-container {
     position: relative;
     width: 100%;
     aspect-ratio: 16 / 9;
@@ -594,7 +395,7 @@ main {
     background: #000;
 }
 
-.youtube-container iframe {
+.video-container iframe {
     position: absolute;
     inset: 0;
     width: 100%;
@@ -602,68 +403,136 @@ main {
     border: 0;
 }
 
+/* ======================================
+   CLOSE BUTTONS
+====================================== */
+
+.close-intro {
+    display: none;
+}
+
+.close-project {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    margin: 0 0 12px auto;
+    padding: 0;
+    border: 1px solid #e5e5e5;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.96);
+    color: #111;
+    font-family: Arial, sans-serif;
+    font-size: 23px;
+    font-weight: 300;
+    line-height: 1;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    transition: background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.close-project:hover {
+    background: #f2f2f2;
+    transform: scale(1.06);
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.12);
+}
+
+.close-project:active {
+    transform: scale(0.94);
+}
 
 /* ======================================
-   MOBILE
+   MOBILE NAVIGATION
 ====================================== */
 
 @media (max-width: 700px) {
-
-    .introduction h1 {
-        font-size: 28px;
+    .nav-content {
+        padding: 0 15px;
     }
 
-    .intro-images {
+    #main {
+        position: relative;
+        display: block;
+    }
+
+    #projectList,
+    #projectShow {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        border: 0;
+    }
+
+    /* Default mobile state is the introduction. */
+    #projectList {
+        display: none;
+    }
+
+    #projectShow {
+        display: block;
+        padding: 15px 20px 30px;
+    }
+
+    body.mobile-intro-open #projectList,
+    body.project-open #projectList {
+        display: none;
+    }
+
+    body.mobile-intro-open #projectShow,
+    body.project-open #projectShow {
+        display: block;
+    }
+
+    body.mobile-list-open #projectList {
+        display: block;
+    }
+
+    body.mobile-list-open #projectShow {
+        display: none;
+    }
+
+    .close-intro {
+        position: fixed;
+        top: 82px;
+        right: 14px;
+        z-index: 1001;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 38px;
+        height: 38px;
+        padding: 0;
+        border: 1px solid #e5e5e5;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.96);
+        color: #111;
+        font-family: Arial, sans-serif;
+        font-size: 23px;
+        font-weight: 300;
+        line-height: 1;
+        cursor: pointer;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    }
+
+    .close-project {
+        position: fixed;
+        top: 82px;
+        right: 14px;
+        z-index: 1001;
+        margin: 0;
+    }
+
+    .gallery-grid {
         grid-template-columns: 1fr;
     }
 
-    .intro-images figure:last-child:nth-child(odd) {
-        grid-column: auto;
+    .project-content h1 {
+        font-size: 26px;
     }
-
 }
-
-
-/* ======================================
-   PROJECT TYPE SYMBOLS
-====================================== */
-
-#projectLi a {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-}
-
-/* VIDEO: triangle pointing up */
-
-#projectLi li[data-type="video"] a::before {
-    content: "";
-
-    width: 0;
-    height: 0;
-
-    flex-shrink: 0;
-
-    border-left: 6px solid transparent;
-    border-right: 6px solid transparent;
-    border-bottom: 10px solid black;
-}
-
-/* LIVE: triangle pointing down */
-
-#projectLi li[data-type="live"] a::before {
-    content: "";
-
-    width: 0;
-    height: 0;
-
-    flex-shrink: 0;
-
-    border-left: 6px solid transparent;
-    border-right: 6px solid transparent;
-    border-top: 10px solid black;
-}
-
-/* ======================================
-   FILTER TYPE SYMBOLS
-====================================== */
